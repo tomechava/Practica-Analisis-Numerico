@@ -17,8 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from metodosNumericos import views as views
+from Sistemas import views as SistemasViews
+from Ecuaciones import views as EcuacionesViews
+from Interpolacion import views as InterpolacionViews
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home),  #home page
+    path('sistemas/', SistemasViews.sistemas),  #sistemas page
+    path('ecuaciones/', EcuacionesViews.ecuaciones),  #ecuaciones page
+    path('interpolacion/', InterpolacionViews.interpolacion),  #interpolacion page
 ]

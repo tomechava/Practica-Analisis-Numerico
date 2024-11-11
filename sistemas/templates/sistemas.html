@@ -1,0 +1,43 @@
+{% extends 'base_template.html' %}
+{% block content %}
+    <div class="row">
+        <div class="col-12 my-3">
+            <h1 class="h1">Sistemas</h1>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-4">
+            <h3> Metodo de Gauss con pivoteo parcial</h3>
+            <p>Este método consiste en descomponer la matriz de coeficientes en una matriz diagonal, una matriz triangular inferior y una matriz triangular superior, y aplicar iteraciones para obtener la solución del sistema.</p>
+            <a href="/gauss_pivoteo_parcial" class="btn btn-primary">Ir al método de Gauss con pivoteo parcial</a>
+        </div>
+        <div class="col-4">
+            <h3> Factorizacion LU</h3>
+            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ab aut explicabo odit aperiam architecto impedit vitae, eos enim iste omnis sapiente provident at, nemo, alias cumque iure ut quibusdam ea!</p>
+            <a href="/factorizacion_lu" class="btn btn-primary">Ir al método de Factorizacion LU</a>
+        </div>
+        <div class="col-4">
+            <h3>Metodo de Jacobi</h3>
+            <p>Este método consiste en descomponer la matriz de coeficientes en una matriz diagonal, una matriz triangular inferior y una matriz triangular superior, y aplicar iteraciones para obtener la solución del sistema.</p>
+            <a href="/jacobi" class="btn btn-primary">Ir al método de Jacobi</a>
+        </div>
+        
+    </div>
+    <div class="row mt-3">
+        <div class="col-4">
+            <h3>Metodo de Gauss con pivoteo total</h3>
+            <p>Este método consiste en descomponer la matriz de coeficientes en una matriz diagonal, una matriz triangular inferior y una matriz triangular superior, y aplicar iteraciones para obtener la solución del sistema.</p>
+            <a href="/gauss_pivoteo_total" class="btn btn-primary">Ir al método de Gauss con pivoteo total</a>
+        </div>
+        <div class="col-4">
+            <h3>Metodo de Doolittle</h3>
+            <p>Este método consiste en descomponer la matriz de coeficientes en una matriz diagonal, una matriz triangular inferior y una matriz triangular superior, y aplicar iteraciones para obtener la solución del sistema.</p>
+            <a href="/doolittle" class="btn btn-primary">Ir al método de Doolittle</a>
+        </div>
+        <div class="col-4">
+            <h3>Metodo de Gauss-Seidel</h3>
+            <p>Este método consiste en descomponer la matriz de coeficientes en una matriz diagonal, una matriz triangular inferior y una matriz triangular superior, y aplicar iteraciones para obtener la solución del sistema.</p>
+            <a href="/gauss_seidel" class="btn btn-primary">Ir al método de Gauss-Seidel</a>
+        </div>
+    </div>
+{% endblock content %}
