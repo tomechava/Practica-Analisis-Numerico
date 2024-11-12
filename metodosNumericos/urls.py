@@ -25,7 +25,13 @@ from Interpolacion import views as InterpolacionViews
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home),  #home page
-    path('sistemas/', SistemasViews.sistemas),  #sistemas page
     path('ecuaciones/', EcuacionesViews.ecuaciones),  #ecuaciones page
+    path('biseccion/', EcuacionesViews.biseccion),  #biseccion page
+    path('regla_falsa/', EcuacionesViews.regla_falsa),  #regla falsa page
+    path('punto_fijo/', EcuacionesViews.punto_fijo),  #punto fijo page
+    path('newton/', EcuacionesViews.newton),  #newton page
+    path('raices_multiples/', EcuacionesViews.raices_multiples),  #raices multiples page
+    path('secante/', EcuacionesViews.secante),  #secante page
+    path('sistemas/', SistemasViews.sistemas),  #sistemas page
     path('interpolacion/', InterpolacionViews.interpolacion),  #interpolacion page
 ]
