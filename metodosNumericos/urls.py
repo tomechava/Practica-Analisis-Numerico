@@ -27,6 +27,7 @@ urlpatterns = [
     path('', views.home),  #home page
     path('ecuaciones/', EcuacionesViews.ecuaciones),  #ecuaciones page
     path('biseccion/', EcuacionesViews.biseccion),  #biseccion page
+    path('biseccion/result/', EcuacionesViews.biseccion_result, name='biseccion_result'),  #biseccion result page
     path('regla_falsa/', EcuacionesViews.regla_falsa),  #regla falsa page
     path('punto_fijo/', EcuacionesViews.punto_fijo),  #punto fijo page
     path('newton/', EcuacionesViews.newton),  #newton page

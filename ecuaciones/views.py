@@ -16,9 +16,9 @@ def biseccion(request):
     
     return render(request, 'biseccion.html')
 
-def biseccion_result(request, f, a, b, tol, n):
+def biseccion_result(request, f, a, b, tol, n,):
     
-    if f(a) * f(b) >= 0:
+    if function(f, a) * function(f, b) > 0:
         error_msg = "Error: f(a) y f(b) deben tener signos opuestos"
         alert = "danger"
         return render(request, 'biseccion.html', {'error_msg': error_msg, 'alert': alert})
@@ -29,11 +29,13 @@ def biseccion_result(request, f, a, b, tol, n):
         c = (a + b) / 2
         
         #Condicion de convergencia
-        if f(c) == 0 or (b - a) / 2 < tol:
-            break
+        if function(f, c) == 0 or (b - a) / 2 < tol:
+            error_msg = "El metodo converge"
+            alert = "success"
+            return render(request, 'biseccion_result.html', {'c': c, 'error_msg': error_msg, 'alert': alert})
         
         #Actualizamos los limites
-        if f(c) * f(a) < 0:
+        if function(f, a) * function(f, c) < 0:
             b = c
         else:
             a = c
@@ -58,5 +60,12 @@ def raices_multiples(request):
 
 def secante(request):
     return render(request, 'secante.html')
+
+def function(function, x):
+    #Reemplaza x por el valor de x
+    replaced_function = function.replace("x", "(" + str(x) + ")")   
+    
+    #eval() evalua la expresion
+    return eval(replaced_function)  
 
     

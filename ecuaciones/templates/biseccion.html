@@ -7,5 +7,14 @@
             <h1 class="h1">Método de la bisección</h1>
         </div>
     </div>
+    <form action="#" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="pb-3 col-lg-4 col-12">
+                <label for="petAge">Función:</label>
+                <input type="number" id="function" name="function" class="form-control" placeholder="x**2 - 4" required>
+            </div>
+        </div>
+    </div>
 
 {% endblock content %}
