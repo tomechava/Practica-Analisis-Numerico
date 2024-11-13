@@ -11,8 +11,25 @@
         {% csrf_token %}
         <div class="row">
             <div class="pb-3 col-lg-4 col-12">
-                <label for="petAge">Función:</label>
-                <input type="number" id="function" name="function" class="form-control" placeholder="x**2 - 4" required>
+                <label for="f">Función:</label>
+                <input type="text" id="f" name="f" class="form-control" placeholder="x**2 - 4" required>
+            </div>
+            <div class="pb-3 col-lg-4 col-12">
+                <label for="a">Inicio Intervalo:</label>
+                <input type="number" id="a" name="a" class="form-control" placeholder="1" required>
+            </div>
+            <div class="pb-3 col-lg-4 col-12">
+                <label for="b">Final Intervalo::</label>
+                <input type="number" id="b" name="b" class="form-control" placeholder="2" required>
+            </div>
+            <div class="pb-3 col-lg-4 col-12">
+                <label for="tol">Tolerancia:</label>
+                <input type="text" id="tol" name="tol" class="form-control" placeholder="0.0001" required>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Calcular</button>
             </div>
         </div>
     </div>

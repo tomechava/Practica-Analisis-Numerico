@@ -8,43 +8,58 @@ def ecuaciones(request):
 def biseccion(request):
     if request.method == 'POST':    #Si se envió un formulario
         f = request.POST['f']       #funcion
-        a = request.POST['a']       #limite inferior
-        b = request.POST['b']       #limite superior
-        tol = request.POST['tol']   #tolerancia
-        n = request.POST['n']       #iteraciones
+        a = int(request.POST['a'])       #limite inferior
+        b = int(request.POST['b'])       #limite superior
+        tol = float(request.POST['tol'])   #tolerancia
+        n = 100       #iteraciones
+    
         return redirect('biseccion_result', f=f, a=a, b=b, tol=tol, n=n)
     
     return render(request, 'biseccion.html')
 
-def biseccion_result(request, f, a, b, tol, n,):
+def biseccion_result(request, f, a, b, tol, n):
+    tol = float(tol)  # Convertir tol a float
     
     if function(f, a) * function(f, b) > 0:
         error_msg = "Error: f(a) y f(b) deben tener signos opuestos"
         alert = "danger"
         return render(request, 'biseccion.html', {'error_msg': error_msg, 'alert': alert})
     
-    c = a #c es el punto medio, lo inicializamos con a que es el limite inferior
+    # Inicializamos c y los errores
+    c = a  # Punto medio
+    prev_c = None  # Variable para almacenar el valor anterior de c
+    error_abs = None
+    error_rel = None
+
     for i in range(n):
-        #Calculamos el punto medio
+        # Calculamos el punto medio
         c = (a + b) / 2
+
+        # Si prev_c no es None, calculamos los errores
+        if prev_c is not None:
+            error_abs = abs(c - prev_c)
+            error_rel = abs(error_abs / c) if c != 0 else None
         
-        #Condicion de convergencia
+        # Condición de convergencia
         if function(f, c) == 0 or (b - a) / 2 < tol:
-            error_msg = "El metodo converge"
+            error_msg = "El método converge"
             alert = "success"
-            return render(request, 'biseccion_result.html', {'c': c, 'error_msg': error_msg, 'alert': alert})
+            return render(request, 'biseccion_result.html', {'c': c, 'error_abs': error_abs, 'error_rel': error_rel, 'error_msg': error_msg, 'alert': alert})
         
-        #Actualizamos los limites
+        # Actualizamos los límites y el valor anterior de c
         if function(f, a) * function(f, c) < 0:
             b = c
         else:
             a = c
-        
-    #Si el metodo no converge
-    error_msg = "Error: El metodo no converge"
-    alert = "danger"    
 
-    return render(request, 'biseccion_result.html', {'c': c, 'error_msg': error_msg, 'alert': alert})
+        prev_c = c  # Guardamos el valor actual de c como el valor previo
+
+    # Si el método no converge en n iteraciones
+    error_msg = "Error: El método no converge"
+    alert = "danger"
+    
+    return render(request, 'biseccion_result.html', {'c': c, 'error_abs': error_abs, 'error_rel': error_rel, 'error_msg': error_msg, 'alert': alert})
+
 
 def regla_falsa(request):
     return render(request, 'regla_falsa.html')
