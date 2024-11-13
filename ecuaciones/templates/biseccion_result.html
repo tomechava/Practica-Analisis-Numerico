@@ -38,10 +38,13 @@
 
     <!-- Gráfica de Convergencia -->
     <div class="col-md-6 text-center">
-        <h3 class="h5">Gráfica de Convergencia</h3>
-        <img src="data:image/png;base64,{{ grafica }}" class="img-fluid mt-3" alt="Gráfica de Convergencia del Método de Bisección">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h3 class="h5 mb-0">Gráfica de Convergencia</h3>
+            </div>
+            <img src="data:image/png;base64,{{ grafica }}" class="img-fluid card-img-bottom mt-3" alt="Gráfica de Convergencia del Método de Bisección">
+        </div>
     </div>
 </div>
-
 
 {% endblock content %}
