@@ -28,10 +28,10 @@ urlpatterns = [
     path('ecuaciones/', EcuacionesViews.ecuaciones),  #ecuaciones page
     path('biseccion/', EcuacionesViews.biseccion),  #biseccion page
     path('biseccion/<str:error_msg>/<str:alert>/', EcuacionesViews.biseccion, name='biseccion'),  #biseccion page
-    path('biseccion/result/<str:f>/<int:a>/<int:b>/<str:tol>/<int:n>/', EcuacionesViews.biseccion_result, name='biseccion_result'),     #biseccion result page
+    path('biseccion/result/<str:f>/<str:a>/<str:b>/<str:tol>/<int:n>/', EcuacionesViews.biseccion_result, name='biseccion_result'),     #biseccion result page
     path('regla_falsa/', EcuacionesViews.regla_falsa),  #regla falsa page
     path('regla_falsa/<str:error_msg>/<str:alert>/', EcuacionesViews.regla_falsa, name='regla_falsa'),  #regla falsa page
-    path('regla_falsa/result/<str:f>/<int:a>/<int:b>/<str:tol>/<int:n>/', EcuacionesViews.regla_falsa_result, name='regla_falsa_result'),     #regla falsa result page
+    path('regla_falsa/result/<str:f>/<str:a>/<str:b>/<str:tol>/<int:n>/', EcuacionesViews.regla_falsa_result, name='regla_falsa_result'),     #regla falsa result page
     path('punto_fijo/', EcuacionesViews.punto_fijo),  #punto fijo page
     path('newton/', EcuacionesViews.newton),  #newton page
     path('raices_multiples/', EcuacionesViews.raices_multiples),  #raices multiples page

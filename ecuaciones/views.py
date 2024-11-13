@@ -12,9 +12,9 @@ def ecuaciones(request):
 
 def biseccion(request, error_msg=None, alert=None):
     if request.method == "POST":  # Si se envió un formulario
-        f = request.POST["f"]  # funcion
-        a = int(request.POST["a"])  # limite inferior
-        b = int(request.POST["b"])  # limite superior
+        f = request.POST["f"]   # funcion
+        a = request.POST["a"]   # limite inferior
+        b = request.POST["b"]   # limite superior
         tol = request.POST["tol"]  # tolerancia
         n = 100  # iteraciones
 
@@ -30,9 +30,17 @@ def biseccion(request, error_msg=None, alert=None):
 
 def biseccion_result(request, f, a, b, tol, n):
     tol = float(tol)
+    a = float(a)
+    b = float(b)
 
     if function(f, a) * function(f, b) > 0:
         error_msg = "Error: f(a) y f(b) deben tener signos opuestos"
+        alert = "danger"
+        return redirect("biseccion", error_msg=error_msg, alert=alert)
+    
+    # Verificar si a es menor que b
+    if a > b:
+        error_msg = "Error: a debe ser menor que b"
         alert = "danger"
         return redirect("biseccion", error_msg=error_msg, alert=alert)
 
@@ -107,8 +115,8 @@ def biseccion_result(request, f, a, b, tol, n):
 def regla_falsa(request, error_msg=None, alert=None):
     if request.method == "POST":  # Si se envió un formulario
         f = request.POST["f"]  # funcion
-        a = int(request.POST["a"])  # limite inferior
-        b = int(request.POST["b"])  # limite superior
+        a = request.POST["a"]  # limite inferior
+        b = request.POST["b"]  # limite superior
         tol = request.POST["tol"]  # tolerancia
         n = 100  # iteraciones
 
@@ -124,10 +132,18 @@ def regla_falsa(request, error_msg=None, alert=None):
 
 def regla_falsa_result(request, f, a, b, tol, n):
     tol = float(tol)
+    a = float(a)
+    b = float(b)
     
     # Verificar si el método es aplicable
     if function(f, a) * function(f, b) > 0:
         error_msg = "Error: f(a) y f(b) deben tener signos opuestos"
+        alert = "danger"
+        return redirect("regla_falsa", error_msg=error_msg, alert=alert)
+    
+    # Verificar si a es menor que b
+    if a > b:
+        error_msg = "Error: a debe ser menor que b"
         alert = "danger"
         return redirect("regla_falsa", error_msg=error_msg, alert=alert)
     
@@ -196,7 +212,7 @@ def regla_falsa_result(request, f, a, b, tol, n):
             "error_rel": error_rel,
             "error_msg": 0,
             "alert": 0,
-            "grafica": 0,
+            "grafica": grafica_base64,
             "num_iteraciones": num_iteraciones,  # Pasamos el número de iteraciones
         },
     )
