@@ -2,11 +2,11 @@
 
 {% block content %}
 
-    <div class="row">
-        <div class="col-12 my-3">
-            <h1 class="h1">Método de la bisección</h1>
-        </div>
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4 mb-4">Método de la Bisección</h1>
     </div>
+</div>
     <form action="#" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="row">
@@ -31,6 +31,19 @@
             <div class="col-12">
                 <button type="submit" class="btn btn-primary">Calcular</button>
             </div>
+        </div>
+    </form>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            {% if alert == "success" %}
+                <div class="alert alert-success" role="alert">
+                    {{ error_msg }}
+                </div>
+            {% elif alert == "danger" %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error_msg }}
+                </div>
+            {% endif %}
         </div>
     </div>
 

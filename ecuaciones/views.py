@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
+import matplotlib.pyplot as plt
+import io
+import base64
 
 # Create your views here.
 def ecuaciones(request):
@@ -18,47 +21,76 @@ def biseccion(request):
     return render(request, 'biseccion.html')
 
 def biseccion_result(request, f, a, b, tol, n):
-    tol = float(tol)  # Convertir tol a float
-    
+    tol = float(tol)
+
     if function(f, a) * function(f, b) > 0:
         error_msg = "Error: f(a) y f(b) deben tener signos opuestos"
         alert = "danger"
         return render(request, 'biseccion.html', {'error_msg': error_msg, 'alert': alert})
-    
-    # Inicializamos c y los errores
+
     c = a  # Punto medio
-    prev_c = None  # Variable para almacenar el valor anterior de c
+    prev_c = None
     error_abs = None
     error_rel = None
+    num_iteraciones = 0
+    iteraciones = []
+    valores_c = []
 
     for i in range(n):
-        # Calculamos el punto medio
+        num_iteraciones += 1  # Contamos cada iteración
         c = (a + b) / 2
+        iteraciones.append(i)
+        valores_c.append(c)
 
-        # Si prev_c no es None, calculamos los errores
+        #Si se supera el limite de iteraciones
+        if i == n-1:
+            error_msg = "Error: Se superó el número máximo de iteraciones"
+            alert = "danger"
+            break
+        
+        # Calcular errores relativo y absoluto
         if prev_c is not None:
             error_abs = abs(c - prev_c)
             error_rel = abs(error_abs / c) if c != 0 else None
-        
-        # Condición de convergencia
+
+        # Verificar si se cumple el criterio de parada
         if function(f, c) == 0 or (b - a) / 2 < tol:
             error_msg = "El método converge"
             alert = "success"
-            return render(request, 'biseccion_result.html', {'c': c, 'error_abs': error_abs, 'error_rel': error_rel, 'error_msg': error_msg, 'alert': alert})
-        
-        # Actualizamos los límites y el valor anterior de c
+            break
+
+        # Actualizar los valores de a y b
         if function(f, a) * function(f, c) < 0:
             b = c
         else:
             a = c
 
-        prev_c = c  # Guardamos el valor actual de c como el valor previo
+        prev_c = c
+        
 
-    # Si el método no converge en n iteraciones
-    error_msg = "Error: El método no converge"
-    alert = "danger"
+    # Generar la gráfica de la convergencia
+    plt.figure()
+    plt.plot(iteraciones, valores_c, marker='o', color='b')
+    plt.xlabel('Iteraciones')
+    plt.ylabel('Valor de c')
+    plt.title('Convergencia del Método de Bisección')
     
-    return render(request, 'biseccion_result.html', {'c': c, 'error_abs': error_abs, 'error_rel': error_rel, 'error_msg': error_msg, 'alert': alert})
+    # Guardar la gráfica como una imagen en formato Base64
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    grafica_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    buffer.close()
+
+    return render(request, 'biseccion_result.html', {
+        'c': c,
+        'error_abs': error_abs,
+        'error_rel': error_rel,
+        'error_msg': error_msg,
+        'alert': alert,
+        'grafica': grafica_base64,
+        'num_iteraciones': num_iteraciones  # Pasamos el número de iteraciones
+    })
 
 
 def regla_falsa(request):

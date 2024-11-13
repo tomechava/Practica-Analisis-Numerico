@@ -1,20 +1,53 @@
 {% extends 'base_template.html' %}
 {% block content %}
 
-    <div class="row">
-        <div class="col-12 my-3">
-            <h1 class="h1">Método de la bisección</h1>
+
+<!-- Header -->
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4 mb-4">Método de la Bisección</h1>
+    </div>
+</div>
+
+<!-- Result Card -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h3 class="h5 mb-0">Resultado</h3>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Punto medio (c):</strong> {{ c }}</p>
+                <p class="mb-2"><strong>Error relativo:</strong> {{ error_rel }}</p>
+                <p class="mb-2"><strong>Error absoluto:</strong> {{ error_abs }}</p>
+                <p class="mb-2"><strong>Iteraciones ejecutadas:</strong> {{ num_iteraciones }}</p>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <h3>Resultado:</h3>
-            <p>{{ c }}</p>
-            <p>{{ error_rel }}</p>
-            <p>{{ error_abs }}</p>
-            <p>{{ error_msg }}</p>
-            <p>{{ alert }}</p>
-        </div>
+</div>
+
+<!-- Alert for Messages -->
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        {% if alert == "success" %}
+            <div class="alert alert-success" role="alert">
+                {{ error_msg }}
+            </div>
+        {% elif alert == "danger" %}
+            <div class="alert alert-danger" role="alert">
+                {{ error_msg }}
+            </div>
+        {% endif %}
     </div>
+</div>
+
+<!-- Gráfica de Convergencia -->
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 text-center">
+        <h3 class="h5">Gráfica de Convergencia</h3>
+        <img src="data:image/png;base64,{{ grafica }}" class="img-fluid mt-3" alt="Gráfica de Convergencia del Método de Bisección">
+    </div>
+</div>
+
 
 {% endblock content %}
