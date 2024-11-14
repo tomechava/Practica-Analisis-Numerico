@@ -7,30 +7,58 @@
         <h1 class="display-4 mb-4">Método del Punto Fijo</h1>
     </div>
 </div>
-    <form action="#" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="row">
-            <div class="pb-3 col-lg-4 col-12">
-                <label for="g">Función:</label>
-                <input type="text" id="g" name="g" class="form-control" placeholder="x**2-4" required>
+<form action="#" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+        <div class="pb-3 col-lg-4 col-12">
+            <label for="g">Función:</label>
+            <input type="text" id="g" name="g" class="form-control" placeholder="x**2-4" required>
+        </div>
+        <div class="pb-3 col-lg-4 col-12">
+            <label for="x_origin">X inicial (x_origin):</label>
+            <input type="text" id="x_origin" name="x_origin" class="form-control" placeholder="1" required>
+        </div>
+        <div class="pb-3 col-lg-4 col-12">
+            <label for="tol">Tolerancia:</label>
+            <input type="text" id="tol" name="tol" class="form-control" placeholder="0.0001" required>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Calcular</button>
+        </div>
+    </div>
+</form>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        {% if alert == "success" %}
+            <div class="alert alert-success" role="alert">
+                {{ error_msg }}
             </div>
-            <div class="pb-3 col-lg-4 col-12">
-                <label for="x_origin">X inicial (x_origin):</label>
-                <input type="text" id="x_origin" name="x_origin" class="form-control" placeholder="1" required>
+        {% elif alert == "danger" %}
+            <div class="alert alert-danger" role="alert">
+                {{ error_msg }}
             </div>
-            <div class="pb-3 col-lg-4 col-12">
-                <label for="tol">Tolerancia:</label>
-                <input type="text" id="tol" name="tol" class="form-control" placeholder="0.0001" required>
+        {% endif %}
+    </div>
+</div>
+{% if x %}
+<!-- Result Card -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h3 class="h5 mb-0">Resultado</h3>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Punto medio (x):</strong> {{ x }}</p>
+                <p class="mb-2"><strong>Error relativo:</strong> {{ error_rel }}</p>
+                <p class="mb-2"><strong>Error absoluto:</strong> {{ error_abs }}</p>
+                <p class="mb-2"><strong>Iteraciones ejecutadas:</strong> {{ num_iteraciones }}</p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Calcular</button>
-            </div>
-        </div>
-    </form>
-    <div class="row justify-content-center mt-4">
-        <div class="col-md-8">
+        <!-- Alert for Messages -->
+        <div class="mt-5">
             {% if alert == "success" %}
                 <div class="alert alert-success" role="alert">
                     {{ error_msg }}
@@ -42,5 +70,27 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- Gráfica de Convergencia -->
+    <div class="col-md-6 text-center">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h3 class="h5 mb-0">Gráfica de Convergencia</h3>
+            </div>
+            <img src="data:image/png;base64,{{ grafica }}" class="img-fluid card-img-bottom mt-3" alt="Gráfica de Convergencia del Método de Punto Fijo">
+        </div>
+    </div>
+</div>
+{% elif alert == "danger" %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger" role="alert">
+            {{ error_msg }}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
 
 {% endblock content %}

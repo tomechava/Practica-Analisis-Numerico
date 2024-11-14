@@ -228,14 +228,16 @@ def punto_fijo(request, error_msg=None, alert=None):
         tol = request.POST["tol"]
         n = 100
 
-        return redirect("punto_fijo_result", g='(x+2)/3', x_origin='1', tol='0.0001', n=n)
+        num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64 = punto_fijo_result(g, x_origin, tol, n)
+        
+        return render(request, "punto_fijo.html", {"num_iteraciones": num_iteraciones, "error_msg": error_msg, "alert": alert, "x": x, "error_abs": error_abs, "error_rel": error_rel, "iteraciones": iteraciones, "valores_x": valores_x, "grafica": grafica_base64})
     
     if error_msg is not None:
         return render(request, "punto_fijo.html", {"error_msg": error_msg, "alert": alert})
     
     return render(request, "punto_fijo.html")
 
-def punto_fijo_result(request, g, x_origin, tol, n):
+def punto_fijo_result(g, x_origin, tol, n):
     tol = float(tol)
     x_origin = float(x_origin)
     
@@ -246,6 +248,7 @@ def punto_fijo_result(request, g, x_origin, tol, n):
     error_abs = None
     error_rel = None
     valores_x = []
+    grafica_base64 = None
     
     for i in range(n):
         num_iteraciones += 1
@@ -258,13 +261,13 @@ def punto_fijo_result(request, g, x_origin, tol, n):
         if abs(x) > 1e10:
             error_msg = "Error: El método diverge"
             alert = "danger"
-            return redirect("punto_fijo", error_msg=error_msg, alert=alert)
+            return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
         
         # Si se supera el límite de iteraciones
         if i == n - 1:
             error_msg = "Error: Se superó el número máximo de iteraciones (100)"
             alert = "danger"
-            return redirect("punto_fijo", error_msg=error_msg, alert=alert)
+            return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
         
         # Calcular errores relativo y absoluto
         if x_prev is not None:
@@ -295,32 +298,25 @@ def punto_fijo_result(request, g, x_origin, tol, n):
     grafica_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
     buffer.close()
     
-    return render(
-        request,
-        "punto_fijo_result.html",
-        {
-            "x": x,
-            "error_abs": error_abs,
-            "error_rel": error_rel,
-            "error_msg": error_msg,
-            "alert": alert,
-            "grafica": grafica_base64,
-            "num_iteraciones": num_iteraciones,  # Pasamos el número de iteraciones
-        },
-    )
+    return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
     
-def newton(request):
+def newton(request, error_msg=None, alert=None):
     if request.POST:
         f = request.POST.get("f")
         xOrigin = request.POST.get("xOrigin")
         tol = request.POST.get("tol")
         n = 100
 
-        return redirect("newton_result", f=f, xOrigin=xOrigin, tol=tol, n=n)
+        f, df = newton_result(f, xOrigin, tol, n)
+        
+        return render(request, "newton.html", {"f": f, "df": df})
+    
+    if error_msg is not None:
+        return render(request, "newton.html", {"error_msg": error_msg, "alert": alert})
     
     return render(request, "newton.html")
 
-def newton_result(request, f, xOrigin, tol, n):
+def newton_result(f, xOrigin, tol, n):
     #Calcular la derivada de la función
     x = symbols('x')
     f = eval(f)
@@ -330,7 +326,7 @@ def newton_result(request, f, xOrigin, tol, n):
     xOrigin = float(xOrigin)
     
     
-    return render(request, "newton_result.html", {"f": f, "df": df, "xOrigin": xOrigin, "tol": tol, "n": n})
+    return f, df
 
 
 def raices_multiples(request):

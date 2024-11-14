@@ -29,4 +29,18 @@
     </div>
 </form>
 
+{% if df %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h2 class="display-5">Resultados</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <h2>f: {{ f }}</h2>
+        <h2>df: {{ df }}</h2>
+    </div>
+</div>
+{% endif %}
+
 {% endblock content %}
