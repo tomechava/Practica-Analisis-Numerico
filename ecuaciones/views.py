@@ -307,9 +307,9 @@ def newton(request, error_msg=None, alert=None):
         tol = request.POST.get("tol")
         n = 100
 
-        f, df = newton_result(f, xOrigin, tol, n)
+        num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64 = newton_result(f, xOrigin, tol, n)
         
-        return render(request, "newton.html", {"f": f, "df": df})
+        return render(request, "newton.html", {"num_iteraciones": num_iteraciones, "error_msg": error_msg, "alert": alert, "x": x, "error_abs": error_abs, "error_rel": error_rel, "iteraciones": iteraciones, "valores_x": valores_x, "grafica": grafica_base64})
     
     if error_msg is not None:
         return render(request, "newton.html", {"error_msg": error_msg, "alert": alert})
@@ -325,8 +325,73 @@ def newton_result(f, xOrigin, tol, n):
     tol = float(tol)
     xOrigin = float(xOrigin)
     
+    # Inicializamos las variables
+    num_iteraciones = 0
+    iteraciones = []
+    x_prev = xOrigin
+    error_abs = None
+    error_rel = None
+    valores_x = []
+    grafica_base64 = None
     
-    return f, df
+    for i in range(n):
+        num_iteraciones += 1
+        
+        # Calculamos el nuevo valor de x usando el método de Newton
+        f_x = function(str(f), x_prev)   # Evaluamos f(x)
+        df_x = function(str(df), x_prev)  # Evaluamos f'(x)
+        
+        # Verificamos que la derivada no sea cero para evitar división por cero
+        if df_x == 0:
+            error_msg = "Error: La derivada es cero, el método no puede continuar."
+            alert = "danger"
+            return num_iteraciones, error_msg, alert, x_prev, error_abs, error_rel, iteraciones, valores_x, grafica_base64
+        
+        x = x_prev - f_x / df_x
+        iteraciones.append(i)
+        valores_x.append(x)
+        
+        # Si diverge
+        if abs(x) > 1e10:
+            error_msg = "Error: El método diverge"
+            alert = "danger"
+            return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
+        
+        # Si se supera el límite de iteraciones
+        if i == n - 1:
+            error_msg = "Error: Se superó el número máximo de iteraciones (100)"
+            alert = "danger"
+            return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
+        
+        # Calcular errores relativo y absoluto
+        if x_prev is not None:
+            error_abs = abs(x - x_prev)
+            error_rel = abs(error_abs / x) if x != 0 else None
+            
+        # Verificar si se cumple el criterio de parada
+        if abs(x - x_prev) < tol:
+            error_msg = "El método converge"
+            alert = "success"
+            break
+            
+        # Actualizar el valor de x_prev
+        x_prev = x
+    
+    # Generar la gráfica de la convergencia
+    plt.figure()
+    plt.plot(iteraciones, valores_x, marker="o", color="b")
+    plt.xlabel("Iteraciones")
+    plt.ylabel("Valor de x")
+    plt.title("Convergencia del Método de Newton")
+    
+    # Guardar la gráfica como una imagen en formato Base64
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format="png")
+    buffer.seek(0)
+    grafica_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    buffer.close()
+    
+    return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
 
 
 def raices_multiples(request):
