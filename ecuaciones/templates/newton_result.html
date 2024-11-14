@@ -1,0 +1,32 @@
+{% extends 'base_template.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4 mb-4">Resultado del Método de Newton</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-success" role="alert">
+            
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <h2 class="display-5">Resultado:{{ df }}</h2>
+        <p class="lead">La raíz de la función es: {{ f }}</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <h2 class="display-5">x0:{{ xOrigin }}</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <h2 class="display-5">Tolerancia:{{ tol }}</h2>
+    </div>
+</div>
+{% endblock content %}

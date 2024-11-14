@@ -1,0 +1,32 @@
+{% extends 'base_template.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4 mb-4">Método de Newton</h1>
+    </div>
+</div>
+<form action="#" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+        <div class="pb-3 col-lg-4 col-12">
+            <label for="f">Función:</label>
+            <input type="text" id="f" name="f" class="form-control" placeholder="x**2-4" required>
+        </div>
+        <div class="pb-3 col-lg-4 col-12">
+            <label for="xOrigin">X inicial (xOrigin):</label>
+            <input type="text" id="xOrigin" name="xOrigin" class="form-control" placeholder="1" required>
+        </div>
+        <div class="pb-3 col-lg-4 col-12">
+            <label for="tol">Tolerancia:</label>
+            <input type="text" id="tol" name="tol" class="form-control" placeholder="0.0001" required>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Calcular</button>
+        </div>
+    </div>
+</form>
+
+{% endblock content %}

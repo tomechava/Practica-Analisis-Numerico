@@ -40,8 +40,9 @@ urlpatterns = [
     path('punto_fijo/result/<str:g>/<str:x_origin>/<str:tol>/<int:n>/', EcuacionesViews.punto_fijo_result, name='punto_fijo_result'),     #punto fijo result page
     
     path('newton/', EcuacionesViews.newton),  #newton page
-    path('newton/<str:error_msg>/<str:alert>/', EcuacionesViews.newton, name='newton'),  #newton page
-    path('newton/result/<str:f>/<str:df>/<str:x_origin>/<str:tol>/<int:n>/', EcuacionesViews.newton_result, name='newton_result'),     #newton result page
+    #path('newton/<str:error_msg>/<str:alert>/', EcuacionesViews.newton, name='newton'),  #newton page
+    path('newton/result/<str:f>/<str:x_origin>/<str:tol>/<int:n>/', EcuacionesViews.newton_result, name='newton_result'),     #newton result page
+    #path('newton/result/<str:f>/<str:df>/<str:x_origin>/<str:tol>/<int:n>/', EcuacionesViews.newton_result, name='newton_result'),     #newton result page
     
     path('raices_multiples/', EcuacionesViews.raices_multiples),  #raices multiples page
     

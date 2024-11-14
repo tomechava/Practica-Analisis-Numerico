@@ -4,6 +4,7 @@ import io
 import base64
 import numpy as np
 from django.http import HttpResponse
+from sympy import symbols, diff
 
 # Create your views here.
 def ecuaciones(request):
@@ -309,10 +310,27 @@ def punto_fijo_result(request, g, x_origin, tol, n):
     )
     
 def newton(request):
+    if request.POST:
+        f = request.POST.get("f")
+        xOrigin = request.POST.get("xOrigin")
+        tol = request.POST.get("tol")
+        n = 100
+
+        return redirect("newton_result", f=f, xOrigin=xOrigin, tol=tol, n=n)
+    
     return render(request, "newton.html")
 
-def newton_result(request):
-    return render(request, "newton_result.html")
+def newton_result(request, f, xOrigin, tol, n):
+    #Calcular la derivada de la función
+    x = symbols('x')
+    f = eval(f)
+    df = diff(f, x)
+    
+    tol = float(tol)
+    xOrigin = float(xOrigin)
+    
+    
+    return render(request, "newton_result.html", {"f": f, "df": df, "xOrigin": xOrigin, "tol": tol, "n": n})
 
 
 def raices_multiples(request):
