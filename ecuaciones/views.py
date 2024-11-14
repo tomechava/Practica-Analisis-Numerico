@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import numpy as np
-
+from django.http import HttpResponse
 
 # Create your views here.
 def ecuaciones(request):
@@ -220,12 +220,99 @@ def regla_falsa_result(request, f, a, b, tol, n):
 
 
 
-def punto_fijo(request):
+def punto_fijo(request, error_msg=None, alert=None):
+    if request.method == "POST":
+        g = request.POST["g"]
+        x_origin = request.POST["x_origin"]
+        tol = request.POST["tol"]
+        n = 100
+
+        return redirect("punto_fijo_result", g='(x+2)/3', x_origin='1', tol='0.0001', n=n)
+    
+    if error_msg is not None:
+        return render(request, "punto_fijo.html", {"error_msg": error_msg, "alert": alert})
+    
     return render(request, "punto_fijo.html")
 
-
+def punto_fijo_result(request, g, x_origin, tol, n):
+    tol = float(tol)
+    x_origin = float(x_origin)
+    
+    # Inicializamos las variables
+    num_iteraciones = 0
+    iteraciones = []
+    x_prev = x_origin
+    error_abs = None
+    error_rel = None
+    valores_x = []
+    
+    for i in range(n):
+        num_iteraciones += 1
+        
+        x = function(g, x_prev)
+        iteraciones.append(i)
+        valores_x.append(x)
+        
+        #Si diverge
+        if abs(x) > 1e10:
+            error_msg = "Error: El método diverge"
+            alert = "danger"
+            return redirect("punto_fijo", error_msg=error_msg, alert=alert)
+        
+        # Si se supera el límite de iteraciones
+        if i == n - 1:
+            error_msg = "Error: Se superó el número máximo de iteraciones (100)"
+            alert = "danger"
+            return redirect("punto_fijo", error_msg=error_msg, alert=alert)
+        
+        # Calcular errores relativo y absoluto
+        if x_prev is not None:
+            error_abs = abs(x - x_prev)
+            error_rel = abs(error_abs / x) if x != 0 else None
+            
+        # Verificar si se cumple el criterio de parada
+        if abs(x - x_prev) < tol:
+            error_msg = "El método converge"
+            alert = "success"
+            break
+            
+        #actualizar el valor de x_prev
+        x_prev = x
+        
+    #Generar la gráfica de la convergencia
+    plt.figure()
+    plt.plot(iteraciones, valores_x, marker="o", color="b")
+    plt.xlabel("Iteraciones")
+    plt.ylabel("Valor de x")
+    plt.title("Convergencia del Método de Punto Fijo")
+    
+    
+    # Guardar la gráfica como una imagen en formato Base64
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format="png")
+    buffer.seek(0)
+    grafica_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    buffer.close()
+    
+    return render(
+        request,
+        "punto_fijo_result.html",
+        {
+            "x": x,
+            "error_abs": error_abs,
+            "error_rel": error_rel,
+            "error_msg": error_msg,
+            "alert": alert,
+            "grafica": grafica_base64,
+            "num_iteraciones": num_iteraciones,  # Pasamos el número de iteraciones
+        },
+    )
+    
 def newton(request):
     return render(request, "newton.html")
+
+def newton_result(request):
+    return render(request, "newton_result.html")
 
 
 def raices_multiples(request):

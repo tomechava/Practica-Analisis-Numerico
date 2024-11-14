@@ -4,23 +4,19 @@
 
 <div class="row">
     <div class="col-12">
-        <h1 class="display-4 mb-4">Método de la Regla Falsa</h1>
+        <h1 class="display-4 mb-4">Método del Punto Fijo</h1>
     </div>
 </div>
     <form action="#" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="row">
             <div class="pb-3 col-lg-4 col-12">
-                <label for="f">Función:</label>
-                <input type="text" id="f" name="f" class="form-control" placeholder="x**2-4" required>
+                <label for="g">Función:</label>
+                <input type="text" id="g" name="g" class="form-control" placeholder="x**2-4" required>
             </div>
             <div class="pb-3 col-lg-4 col-12">
-                <label for="a">Inicio Intervalo:</label>
-                <input type="text" id="a" name="a" class="form-control" placeholder="1" required>
-            </div>
-            <div class="pb-3 col-lg-4 col-12">
-                <label for="b">Final Intervalo:</label>
-                <input type="text" id="b" name="b" class="form-control" placeholder="2" required>
+                <label for="x_origin">X inicial (x_origin):</label>
+                <input type="text" id="x_origin" name="x_origin" class="form-control" placeholder="1" required>
             </div>
             <div class="pb-3 col-lg-4 col-12">
                 <label for="tol">Tolerancia:</label>
