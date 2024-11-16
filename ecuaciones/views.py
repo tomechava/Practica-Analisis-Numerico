@@ -316,8 +316,13 @@ def newton(request, error_msg=None, alert=None):
     
     return render(request, "newton.html")
 
+import matplotlib.pyplot as plt
+import io
+import base64
+from sympy import symbols, diff
+
 def newton_result(f, xOrigin, tol, n):
-    #Calcular la derivada de la función
+    # Calcular la derivada de la función
     x = symbols('x')
     f = eval(f)
     df = diff(f, x)
@@ -332,7 +337,7 @@ def newton_result(f, xOrigin, tol, n):
     error_abs = None
     error_rel = None
     valores_x = []
-    grafica_base64 = None
+    grafica_base64 = None  # Variable para almacenar la gráfica
     
     for i in range(n):
         num_iteraciones += 1
@@ -377,14 +382,16 @@ def newton_result(f, xOrigin, tol, n):
         # Actualizar el valor de x_prev
         x_prev = x
     
-    # Generar la gráfica de la convergencia
-    plt.figure()
-    plt.plot(iteraciones, valores_x, marker="o", color="b")
-    plt.xlabel("Iteraciones")
-    plt.ylabel("Valor de x")
-    plt.title("Convergencia del Método de Newton")
+    # Crear gráfica con los valores de x por iteración
+    plt.figure(figsize=(8, 5))
+    plt.plot(iteraciones, valores_x, marker="o", color="b", label="Valores de x")
+    plt.title("Convergencia del Método de Newton", fontsize=14)
+    plt.xlabel("Iteraciones", fontsize=12)
+    plt.ylabel("Valor de x", fontsize=12)
+    plt.grid(True)
+    plt.legend()
     
-    # Guardar la gráfica como una imagen en formato Base64
+    # Guardar la gráfica en formato Base64
     buffer = io.BytesIO()
     plt.savefig(buffer, format="png")
     buffer.seek(0)
