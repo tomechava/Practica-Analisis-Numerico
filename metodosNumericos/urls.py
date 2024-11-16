@@ -36,8 +36,8 @@ urlpatterns = [
     path('regla_falsa/result/<str:f>/<str:a>/<str:b>/<str:tol>/<int:n>/', EcuacionesViews.regla_falsa_result, name='regla_falsa_result'),     #regla falsa result page
     
     path('punto_fijo/', EcuacionesViews.punto_fijo),  #punto fijo page
-    path('punto_fijo/<str:error_msg>/<str:alert>/', EcuacionesViews.punto_fijo, name='punto_fijo'),  #punto fijo page
-    path('punto_fijo/result/<str:g>/<str:x_origin>/<str:tol>/<int:n>/', EcuacionesViews.punto_fijo_result, name='punto_fijo_result'),     #punto fijo result page
+    #path('punto_fijo/<str:error_msg>/<str:alert>/', EcuacionesViews.punto_fijo, name='punto_fijo'),  #punto fijo page
+    #path('punto_fijo/result/<str:g>/<str:x_origin>/<str:tol>/<int:n>/', EcuacionesViews.punto_fijo_result, name='punto_fijo_result'),     #punto fijo result page
     
     path('newton/', EcuacionesViews.newton),  #newton page
     #path('newton/<str:error_msg>/<str:alert>/', EcuacionesViews.newton, name='newton'),  #newton page

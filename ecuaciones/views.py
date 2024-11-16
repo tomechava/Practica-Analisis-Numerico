@@ -402,11 +402,193 @@ def newton_result(f, xOrigin, tol, n):
 
 
 def raices_multiples(request):
+    if request.POST:
+        f = request.POST.get("f")
+        xOrigin = request.POST.get("xOrigin")
+        tol = request.POST.get("tol")
+        n = 100
+
+        num_iteraciones, error_msg, alert, x, error_abs, iteraciones, valores_x, grafica_base64 = raices_multiples_result(f, xOrigin, tol, n)
+        
+        return render(request, "raices_multiples.html", {"num_iteraciones": num_iteraciones, "error_msg": error_msg, "alert": alert, "x": x, "error_abs": error_abs, "iteraciones": iteraciones, "valores_x": valores_x, "grafica": grafica_base64})
+    
     return render(request, "raices_multiples.html")
 
 
+def raices_multiples_result(f, xOrigin, tol, n):
+    # Calcular la derivada de la función
+    x = symbols('x')
+    f = eval(f)
+    df = diff(f, x)          # Primera derivada
+    ddf = diff(df, x)        # Segunda derivada
+    
+    tol = float(tol)
+    xOrigin = float(xOrigin)
+    
+    # Inicializamos las variables
+    num_iteraciones = 0
+    iteraciones = []
+    x_prev = xOrigin
+    error_abs = None
+    error_rel = None
+    valores_x = []
+    grafica_base64 = None  # Variable para almacenar la gráfica
+    
+    for i in range(n):
+        num_iteraciones += 1
+        
+        f_x = function(str(f), x_prev)       # Evaluamos f(x)
+        df_x = function(str(df), x_prev)    # Evaluamos f'(x)
+        ddf_x = function(str(ddf), x_prev)  # Evaluamos f''(x)
+        
+        # Verificamos que f'(x)^2 - f(x)f''(x) no sea cero
+        denominator = df_x**2 - f_x * ddf_x
+        if denominator == 0:
+            error_msg = "Error: Denominador igual a cero, el método no puede continuar."
+            alert = "danger"
+            return num_iteraciones, error_msg, alert, x_prev, error_abs, iteraciones, valores_x, grafica_base64
+        
+        # Calcular el nuevo valor de x
+        x = x_prev - (f_x * df_x) / denominator
+        iteraciones.append(i)
+        valores_x.append(x)
+        
+                # Si diverge
+        if abs(x) > 1e10:
+            error_msg = "Error: El método diverge"
+            alert = "danger"
+            return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
+        
+        # Si se supera el límite de iteraciones
+        if i == n - 1:
+            error_msg = "Error: Se superó el número máximo de iteraciones (100)"
+            alert = "danger"
+            return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
+        
+        # Calcular errores relativo y absoluto
+        if x_prev is not None:
+            error_abs = abs(x - x_prev)
+            error_rel = abs(error_abs / x) if x != 0 else None
+        
+        # Verificar criterio de parada
+        if error_abs < tol:
+            error_msg = "El método converge"
+            alert = "success"
+            break
+        
+        x_prev = x
+    
+    # Generar gráfica
+    plt.figure(figsize=(8, 5))
+    plt.plot(iteraciones, valores_x, marker="o", color="b", label="Valores de x")
+    plt.title("Convergencia del Método de Raíces Múltiples", fontsize=14)
+    plt.xlabel("Iteraciones", fontsize=12)
+    plt.ylabel("Valor de x", fontsize=12)
+    plt.grid(True)
+    plt.legend()
+    
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format="png")
+    buffer.seek(0)
+    grafica_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    buffer.close()
+    
+    return num_iteraciones, error_msg, alert, x, error_abs, iteraciones, valores_x, grafica_base64
+
+
+
 def secante(request):
+    if request.POST:
+        f = request.POST.get("f")
+        x_zero = request.POST.get("x_zero")
+        x_one = request.POST.get("x_one")
+        tol = request.POST.get("tol")
+        n = 100
+
+        num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64 = metodo_secante(f, x_zero, x_one, tol, n)
+        
+        return render(request, "secante.html", {"num_iteraciones": num_iteraciones, "error_msg": error_msg, "alert": alert, "x": x, "error_rel": error_rel, "error_abs": error_abs, "iteraciones": iteraciones, "valores_x": valores_x, "grafica": grafica_base64})
+    
     return render(request, "secante.html")
+
+
+def metodo_secante(f, x_zero, x_one, tol, n):
+    f = function(str(f), symbols("x"))
+    
+    tol = float(tol)
+    x_zero = float(x_zero)
+    x_one = float(x_one)
+    
+    # Inicializamos las variables
+    x = None
+    num_iteraciones = 0
+    iteraciones = []
+    error_abs = None
+    error_rel = None
+    valores_x = []
+    grafica_base64 = None  # Variable para almacenar la gráfica
+    
+    for i in range(n):
+        num_iteraciones += 1
+        
+        f_x_zero = function(str(f), x_zero)  # f(x_zero)
+        f_x_one = function(str(f), x_one)  # f(x_one)
+        
+        # Verificamos que f(x_one) - f(x_zero) no sea cero
+        denominator = f_x_one - f_x_zero
+        if denominator == 0:
+            error_msg = "Error: División por cero, el método no puede continuar."
+            alert = "danger"
+            return num_iteraciones, error_msg, alert, x_one, error_abs, iteraciones, valores_x, grafica_base64
+        
+        # Calcular el nuevo valor de x
+        x = x_one - f_x_one * (x_one - x_zero) / denominator
+        iteraciones.append(i)
+        valores_x.append(x)
+        
+                        # Si diverge
+        if abs(x) > 1e10:
+            error_msg = "Error: El método diverge"
+            alert = "danger"
+            return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
+        
+        # Si se supera el límite de iteraciones
+        if i == n - 1:
+            error_msg = "Error: Se superó el número máximo de iteraciones (100)"
+            alert = "danger"
+            return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
+        
+        # Calcular errores relativo y absoluto
+        if x_one is not None:
+            error_abs = abs(x - x_one)
+            error_rel = abs(error_abs / x) if x != 0 else None
+        
+        # Verificar criterio de parada
+        if error_abs < tol:
+            error_msg = "El método converge"
+            alert = "success"
+            break
+        
+        x_zero = x_one
+        x_one = x
+    
+    # Generar gráfica
+    plt.figure(figsize=(8, 5))
+    plt.plot(iteraciones, valores_x, marker="o", color="g", label="Valores de x")
+    plt.title("Convergencia del Método de la Secante", fontsize=14)
+    plt.xlabel("Iteraciones", fontsize=12)
+    plt.ylabel("Valor de x", fontsize=12)
+    plt.grid(True)
+    plt.legend()
+    
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format="png")
+    buffer.seek(0)
+    grafica_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    buffer.close()
+    
+    return num_iteraciones, error_msg, alert, x, error_abs, error_rel, iteraciones, valores_x, grafica_base64
+
 
 
 def function(function, x):
