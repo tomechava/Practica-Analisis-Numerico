@@ -49,4 +49,8 @@ urlpatterns = [
     path('secante/', EcuacionesViews.secante),  #secante page
     
     path('sistemas/', SistemasViews.sistemas),  #sistemas page
+    
+    path('gauss_parcial/', SistemasViews.gauss_parcial),  #gauss_parcial page
+    
+    path('gauss_total/', SistemasViews.gauss_total),  #gauss_total page
 ]
