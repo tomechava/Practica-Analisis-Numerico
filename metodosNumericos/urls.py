@@ -53,4 +53,10 @@ urlpatterns = [
     path('gauss_parcial/', SistemasViews.gauss_parcial),  #gauss_parcial page
     
     path('gauss_total/', SistemasViews.gauss_total),  #gauss_total page
+    
+    path('doolittle/', SistemasViews.doolittle),  #doolittle page
+    
+    path('jacobi/', SistemasViews.jacobi),  #jacobi page
+    
+    path('gauss_seidel/', SistemasViews.gauss_seidel),  #gauss_seidel page
 ]

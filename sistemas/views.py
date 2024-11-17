@@ -189,3 +189,118 @@ def gauss_pivoteo_total(A, b):
     alert = "success"
     
     return x_final, etapas, cambios, error_msg, alert
+
+def doolittle(request):
+    if request.POST:
+        # Obtener los datos del formulario
+        columns = int(request.POST['columns'])
+        rows = int(request.POST['rows'])
+        A = np.zeros((rows, columns))
+        
+        for i in range(rows):
+            for j in range(columns):
+                A[i, j] = float(request.POST[f'A[{i}][{j}]'])
+        
+        L, U, error_msg, alert = factorizacion_lu_doolittle(A)
+        
+        return render(request, 'doolittle.html', {'L': L, 'U': U, 'alert': alert, 'error_msg': error_msg, 'columns': columns, 'rows': rows})
+    
+    return render(request, 'doolittle.html')
+
+def factorizacion_lu_doolittle(A):
+    """
+    Realiza la factorización LU de una matriz A utilizando el método de Doolittle.
+    
+    Parámetros:
+        A: numpy.ndarray
+            Matriz cuadrada que será factorizada.
+            
+    Retorna:
+        L: numpy.ndarray
+            Matriz triangular inferior con unos en la diagonal.
+        U: numpy.ndarray
+            Matriz triangular superior.
+        error_msg: str
+            Mensaje de error si la factorización falla.
+        alert: str
+            Tipo de alerta ('danger' si hay error, 'success' si todo va bien).
+    """
+    error_msg = None
+    alert = None
+    
+    # Verificar si la matriz es cuadrada
+    n, m = A.shape
+    if n != m:
+        error_msg = "Error: La matriz no es cuadrada."
+        alert = "danger"
+        return None, None, error_msg, alert
+
+    # Inicializar matrices L y U
+    L = np.eye(n)  # Matriz identidad (unos en la diagonal)
+    U = np.zeros((n, n))  # Matriz de ceros
+
+    # Realizar la factorización
+    for i in range(n):
+        # Verificar si hay un cero en la diagonal principal
+        if A[i, i] == 0:
+            error_msg = "Error: La matriz tiene ceros en la diagonal principal."
+            alert = "danger"
+            return None, None, error_msg, alert
+
+        # Calcular elementos de U
+        for j in range(i, n):
+            U[i, j] = A[i, j] - sum(L[i, k] * U[k, j] for k in range(i))    # U[i, j] = A[i, j] - sum(L[i, k] * U[k, j]) basicamente filas por columnas de la matriz A menos la suma de las filas por columnas de la matriz L por la matriz U
+        
+        # Calcular elementos de L
+        for j in range(i + 1, n):
+            L[j, i] = (A[j, i] - sum(L[j, k] * U[k, i] for k in range(i))) / U[i, i]    # L[j, i] = (A[j, i] - sum(L[j, k] * U[k, i])) / U[i, i] basicamente filas por columnas de la matriz A menos la suma de las filas por columnas de la matriz L por la matriz U dividido por la matriz U
+
+    alert = "success"
+    error_msg = "La factorización LU se realizó correctamente."
+    return L, U, error_msg, alert
+
+def jacobi(request):
+    if request.POST:
+        # Obtener los datos del formulario
+        columns = int(request.POST['columns'])
+        rows = int(request.POST['rows'])
+        A = np.zeros((rows, columns))
+        
+        for i in range(rows):
+            for j in range(columns):
+                A[i, j] = float(request.POST[f'A[{i}][{j}]'])
+        
+        b = np.zeros(rows)
+        for i in range(rows):
+            b[i] = float(request.POST[f'b[{i}]'])
+        
+        x, etapas, error_msg, alert = jacobi_method(A, b)
+        
+        ultima = etapas[-1]
+        
+        return render(request, 'jacobi.html', {'x': x, 'img_url': 0, 'alert': alert, 'error_msg': error_msg, 'etapas': etapas, 'columns': columns, 'rows': rows, 'ultima': ultima})
+    
+    return render(request, 'jacobi.html')
+
+def gauss_seidel(request):
+    if request.POST:
+        # Obtener los datos del formulario
+        columns = int(request.POST['columns'])
+        rows = int(request.POST['rows'])
+        A = np.zeros((rows, columns))
+        
+        for i in range(rows):
+            for j in range(columns):
+                A[i, j] = float(request.POST[f'A[{i}][{j}]'])
+        
+        b = np.zeros(rows)
+        for i in range(rows):
+            b[i] = float(request.POST[f'b[{i}]'])
+        
+        x, etapas, error_msg, alert = gauss_seidel_method(A, b)
+        
+        ultima = etapas[-1]
+        
+        return render(request, 'gauss_seidel.html', {'x': x, 'img_url': 0, 'alert': alert, 'error_msg': error_msg, 'etapas': etapas, 'columns': columns, 'rows': rows, 'ultima': ultima})
+    
+    return render(request, 'gauss_seidel.html')

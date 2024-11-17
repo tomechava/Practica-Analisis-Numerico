@@ -1,9 +1,9 @@
 {% extends "base_template.html" %}
 
-{% block title %}Gauss Total{% endblock %}
+{% block title %}Gauss Parcial{% endblock %}
 
 {% block content %}
-<h1 class="display-4 mb-4">Metodo de Gauss con pivoteo total </h1>
+<h1 class="display-4 mb-4">Metodo de Doolittle</h1>
 <form id="matrixForm" class="mt-4" method="POST">
     {% csrf_token %}
     <div class="row mb-3">
@@ -35,9 +35,9 @@
                 <h3 class="h5 mb-0">Resultado</h3>
             </div>
             <div class="card-body">
-                <p class="mb-2"><strong>Matriz Final:</strong>
+                <p class="mb-2"><strong>L Final(triangular inferior):</strong>
                     <table class="table border">
-                        {% for row in ultima %}
+                        {% for row in L %}
                             <tr>
                                 {% for value in row %}
                                     <td>{{ value }}</td>
@@ -46,12 +46,16 @@
                         {% endfor %}
                     </table>
                 </p>
-                <p class="mb-2"><strong>Valores hallados de Xn:</strong>
-                    <br>
-                    {% for value in x %}
-                        {{ value }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                    </br>
+                <p class="mb-2"><strong>U Final(triangular superior):</strong>
+                    <table class="table border">
+                        {% for row in U %}
+                            <tr>
+                                {% for value in row %}
+                                    <td>{{ value }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </table>
                 </p>
             </div>
         </div>
@@ -117,27 +121,6 @@ function updateMatrixInputs() {
 
     matrixInputsDiv.appendChild(table);
 
-    //Crear inputs para b
-    const labelB = document.createElement("label");
-    labelB.textContent = "Ingrese los valores de b:";
-    labelB.classList.add("form-label", "my-3");
-    matrixInputsDiv.appendChild(labelB);
-
-    const tableB = document.createElement("table");
-    tableB.classList.add("table", "col-md-4");
-    for (let i = 0; i < rows; i++) {
-        const row = document.createElement("tr");
-        const cell = document.createElement("td");
-        const input = document.createElement("input");
-        input.type = "number";
-        input.name = `b[${i}]`;
-        input.classList.add("form-control");
-        cell.appendChild(input);
-        row.appendChild(cell);
-        tableB.appendChild(row);
-    }
-
-    matrixInputsDiv.appendChild(tableB);
 
     //incluir columnas y filas en el formulario
     const inputRows = document.createElement("input");
