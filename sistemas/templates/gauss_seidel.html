@@ -1,0 +1,208 @@
+{% extends "base_template.html" %}
+
+{% block title %}Gauss Parcial{% endblock %}
+
+{% block content %}
+<h1 class="display-4 mb-4">Metodo de Gauss-Seidel</h1>
+<form id="matrixForm" class="mt-4" method="POST">
+    {% csrf_token %}
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="rows" class="form-label">Número de Filas</label>
+            <input type="text" id="rows" class="form-control" placeholder="Ingrese el número de filas" min="1" required>
+        </div>
+        <div class="col-md-4">
+            <label for="columns" class="form-label">Número de Columnas</label>
+            <input type="text" id="columns" class="form-control" placeholder="Ingrese el número de columnas" min="1" required>
+        </div>
+        <div class="col-md-4">
+            <label for="tol" class="form-label">Tolerancia:</label>
+            <input type="text" id="tol" name="tol" class="form-control" placeholder="Ingrese la tolerancia" required>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div id="matrixInputs" class="my-3">
+                <!-- Aquí se generarán dinámicamente los campos de entrada de la matriz -->
+            </div>
+        </div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Enviar</button>
+</form>
+
+<!-- Result Card -->
+<div class="row py-5">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h3 class="h5 mb-0">Resultado</h3>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Solución:</strong>
+                    <table class="table border">
+                        {% for value in x %}
+                            <tr>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                <p class="mb-2"><strong>Error Relativo:</strong> {{ error_rel }}</p>
+                <p class="mb-2"><strong>Error Absoluto:</strong> {{ error_abs }}</p>
+                <p class="mb-2"><strong>Iteraciones:</strong> {{ iteraciones }}</p>
+                <p class="mb-2"><strong>Tol:</strong> {{ tol }}</p>
+            </div>
+        </div>
+        <!-- Alert for Messages -->
+        <div class="mt-5">
+            {% if alert == "success" %}
+                <div class="alert alert-success" role="alert">
+                    {{ error_msg }}
+                </div>
+            {% elif alert == "danger" %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error_msg }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <!-- Gráfica de Convergencia -->
+    <div class="col-md-6 text-center">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h3 class="h5 mb-0">Gráfica de Convergencia</h3>
+            </div>
+            <img src="data:image/png;base64,{{ grafica }}" class="img-fluid card-img-bottom mt-3" alt="Gráfica de Convergencia del Método de Gauss-Seidel">
+        </div>
+    </div>
+</div>
+
+
+<!-- JavaScript -->
+<script>
+    
+    const tolInput = document.getElementById("tol");
+    const rowsInput = document.getElementById("rows");
+    const columnsInput = document.getElementById("columns");
+    const matrixInputsDiv = document.getElementById("matrixInputs");
+
+    let tolHiddenInput;
+    
+    // Escucha cambios en los campos de filas y columnas
+    rowsInput.addEventListener("input", updateMatrixInputs);
+    columnsInput.addEventListener("input", updateMatrixInputs);
+
+    tolInput.addEventListener("input", () => {
+        if (tolHiddenInput) {
+            tolHiddenInput.value = tolInput.value;
+        }
+    });
+    
+    function updateMatrixInputs() {
+        // Limpiar el contenedor de inputs
+        matrixInputsDiv.innerHTML = "";
+    
+        // Obtener el número de filas y columnas
+        const rows = parseInt(rowsInput.value);
+        const columns = parseInt(columnsInput.value);
+
+        if (!rows || !columns || rows < 1 || columns < 1) {
+            return;
+        }
+
+        // Crear campo oculto para tol si no existe
+        if (!tolHiddenInput) {
+            tolHiddenInput = document.createElement("input");
+            tolHiddenInput.type = "hidden";
+            tolHiddenInput.name = "tol";
+            matrixInputsDiv.appendChild(tolHiddenInput);
+        }
+
+        // Actualizar el valor de tolHiddenInput
+        tolHiddenInput.value = tolInput.value;
+    
+        const label = document.createElement("label");
+        label.textContent = "Ingrese los valores de la matriz:";
+        label.classList.add("form-label", "my-3");
+        matrixInputsDiv.appendChild(label);
+    
+        // Crear inputs para la matriz
+        const table = document.createElement("table");
+        table.classList.add("table", "table-bordered");
+        for (let i = 0; i < rows; i++) {
+            const row = document.createElement("tr");
+            for (let j = 0; j < columns; j++) {
+                const cell = document.createElement("td");
+                const input = document.createElement("input");
+                input.type = "text";
+                input.name = `A[${i}][${j}]`;
+                input.classList.add("form-control");
+                cell.appendChild(input);
+                row.appendChild(cell);
+            }
+            table.appendChild(row);
+        }
+    
+        matrixInputsDiv.appendChild(table);
+    
+        //Crear inputs para b
+        const labelB = document.createElement("label");
+        labelB.textContent = "Ingrese los valores de b:";
+        labelB.classList.add("form-label", "my-3");
+        matrixInputsDiv.appendChild(labelB);
+    
+        const tableB = document.createElement("table");
+        tableB.classList.add("table", "col-md-4");
+        for (let i = 0; i < rows; i++) {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+            const input = document.createElement("input");
+            input.type = "text";
+            input.name = `b[${i}]`;
+            input.classList.add("form-control");
+            cell.appendChild(input);
+            row.appendChild(cell);
+            tableB.appendChild(row);
+        }
+    
+        matrixInputsDiv.appendChild(tableB);
+
+        //Crear inputs para x0
+        const labelX0 = document.createElement("label");
+        labelX0.textContent = "Ingrese los valores de x0:";
+        labelX0.classList.add("form-label", "my-3");
+        matrixInputsDiv.appendChild(labelX0);
+
+        const tableX0 = document.createElement("table");
+        tableX0.classList.add("table", "col-md-4");
+        for (let i = 0; i < rows; i++) {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+            const input = document.createElement("input");
+            input.type = "text";
+            input.name = `x0[${i}]`;
+            input.classList.add("form-control");
+            cell.appendChild(input);
+            row.appendChild(cell);
+            tableX0.appendChild(row);
+        }
+
+        matrixInputsDiv.appendChild(tableX0);
+    
+        //incluir columnas y filas en el formulario
+        const inputRows = document.createElement("input");
+        inputRows.type = "hidden";
+        inputRows.name = "rows";
+        inputRows.value = rows;
+        matrixInputsDiv.appendChild(inputRows);
+        
+        const inputColumns = document.createElement("input");
+        inputColumns.type = "hidden";
+        inputColumns.name = "columns";
+        inputColumns.value = columns;
+        matrixInputsDiv.appendChild(inputColumns);
+    
+    }
+    </script>
+
+{% endblock content %}

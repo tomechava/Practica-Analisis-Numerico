@@ -459,6 +459,7 @@ def metodo_jacobi(A, b, x0, tol, max_iter):
 def gauss_seidel(request):
     if request.POST:
         # Obtener los datos del formulario
+        tol = request.POST.get("tol")
         columns = int(request.POST["columns"])
         rows = int(request.POST["rows"])
         A = np.zeros((rows, columns))
@@ -471,9 +472,13 @@ def gauss_seidel(request):
         for i in range(rows):
             b[i] = float(request.POST[f"b[{i}]"])
 
-        x, etapas, error_msg, alert = 0, 0, 0, 0
+        x0 = np.zeros(rows)
+        for i in range(rows):
+            x0[i] = float(request.POST[f"x0[{i}]"])
 
-        ultima = etapas[-1]
+        x, iteraciones, error_msg, alert, error_abs, error_rel, grafica = metodo_gauss_seidel(
+            A, b, x0, tol, 100
+        )
 
         return render(
             request,
@@ -483,15 +488,96 @@ def gauss_seidel(request):
                 "img_url": 0,
                 "alert": alert,
                 "error_msg": error_msg,
-                "etapas": etapas,
+                "iteraciones": iteraciones,
                 "columns": columns,
                 "rows": rows,
-                "ultima": ultima,
+                "error_abs": error_abs,
+                "error_rel": error_rel,
+                "tol": tol,
+                "grafica": grafica,
             },
         )
 
     return render(request, "gauss_seidel.html")
 
+def metodo_gauss_seidel(A, b, x0, tol, max_iter):
+    """
+    Resuelve el sistema Ax = b utilizando el método de Gauss-Seidel.
+    
+    Parámetros:
+        A: numpy.ndarray
+            Matriz de coeficientes (cuadrada).
+        b: numpy.ndarray
+            Vector de términos independientes.
+        x0: numpy.ndarray
+            Vector inicial.
+        tol: float
+            Tolerancia para la convergencia.
+        max_iter: int
+            Número máximo de iteraciones.
+            
+    Retorna:
+        x: numpy.ndarray
+            Solución aproximada del sistema.
+        iteraciones: int
+            Número de iteraciones realizadas.
+        error_msg: str
+            Mensaje de error si ocurre algún problema.
+        alert: str
+            Tipo de alerta ('success' si todo va bien, 'danger' si hay error).
+    """
+    tol = float(tol)
+
+    n, m = A.shape  # Obtener dimensiones de la matriz A
+    error_msg = None
+    alert = None
+    error_abs = None
+    error_rel = None
+    
+    if n != m:  # Verificar si la matriz es cuadrada
+        error_msg = "Error: La matriz no es cuadrada."
+        alert = "danger"
+        return None, None, error_msg, alert, error_abs, error_rel, None
+
+    if np.any(np.diag(A) == 0):  # Verificar si hay ceros en la diagonal principal
+        error_msg = "Error: La matriz tiene ceros en la diagonal principal."
+        alert = "danger"
+        return None, None, error_msg, alert, error_abs, error_rel, None
+    
+    x = x0.copy()
+    iteraciones = 0
+    valores_x = []  # Lista para almacenar los valores de x en cada iteración
+
+    for k in range(max_iter):
+        x_new = x.copy()
+        
+        # Iterar sobre las filas de la matriz A para calcular los nuevos valores de x
+        for i in range(n):
+            suma1 = sum(A[i, j] * x_new[j] for j in range(i))
+            suma2 = sum(A[i, j] * x[j] for j in range(i + 1, n))
+            x_new[i] = (b[i] - suma1 - suma2) / A[i, i]
+        
+        valores_x.append(x_new.copy())  # Guardar los valores actuales de x
+
+        # Calcular error absoluto y relativo
+        error_abs = np.linalg.norm(x_new - x, ord=np.inf)
+        error_rel = error_abs / np.linalg.norm(x_new, ord=np.inf)
+        
+        # Verificar criterio de convergencia
+        if error_abs < tol:
+            alert = "success"
+            error_msg = "El sistema se resolvió correctamente."
+            graph_base64 = graficar_iteraciones(valores_x)
+            return x_new, iteraciones, error_msg, alert, error_abs, error_rel, graph_base64
+        
+        x = x_new
+        iteraciones += 1
+    
+    error_msg = "Error: El método no converge después de {} iteraciones.".format(max_iter)
+    alert = "danger"
+    graph_base64 = graficar_iteraciones(valores_x)
+    
+    return None, iteraciones, error_msg, alert, error_abs, error_rel, graph_base64
 
 
 def graficar_iteraciones(valores_x):    #Para Jacobi y Gauss-Seidel
