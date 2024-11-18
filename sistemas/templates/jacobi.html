@@ -3,7 +3,7 @@
 {% block title %}Gauss Parcial{% endblock %}
 
 {% block content %}
-<h1 class="display-4 mb-4">Metodo de Doolittle</h1>
+<h1 class="display-4 mb-4">Metodo de Jacobi</h1>
 <form id="matrixForm" class="mt-4" method="POST">
     {% csrf_token %}
     <div class="row mb-3">
@@ -17,7 +17,7 @@
         </div>
         <div class="col-md-4">
             <label for="tol" class="form-label">Tolerancia:</label>
-            <input type="text" id="tol" class="form-control" placeholder="Ingrese la tolerancia" required>
+            <input type="text" id="tol" name="tol" class="form-control" placeholder="Ingrese la tolerancia" required>
         </div>
     </div>
     <div class="row">
@@ -39,28 +39,18 @@
                 <h3 class="h5 mb-0">Resultado</h3>
             </div>
             <div class="card-body">
-                <p class="mb-2"><strong>L Final(triangular inferior):</strong>
+                <p class="mb-2"><strong>Solución:</strong>
                     <table class="table border">
-                        {% for row in L %}
+                        {% for value in x %}
                             <tr>
-                                {% for value in row %}
-                                    <td>{{ value }}</td>
-                                {% endfor %}
+                                <td>{{ value }}</td>
                             </tr>
                         {% endfor %}
                     </table>
-                </p>
-                <p class="mb-2"><strong>U Final(triangular superior):</strong>
-                    <table class="table border">
-                        {% for row in U %}
-                            <tr>
-                                {% for value in row %}
-                                    <td>{{ value }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </p>
+                <p class="mb-2"><strong>Error Relativo:</strong> {{ error_rel }}</p>
+                <p class="mb-2"><strong>Error Absoluto:</strong> {{ error_abs }}</p>
+                <p class="mb-2"><strong>Iteraciones:</strong> {{ iteraciones }}</p>
+                <p class="mb-2"><strong>Tol:</strong> {{ tol }}</p>
             </div>
         </div>
         <!-- Alert for Messages -->
@@ -76,18 +66,37 @@
             {% endif %}
         </div>
     </div>
+    <!-- Gráfica de Convergencia -->
+    <div class="col-md-6 text-center">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h3 class="h5 mb-0">Gráfica de Convergencia</h3>
+            </div>
+            <img src="data:image/png;base64,{{ grafica }}" class="img-fluid card-img-bottom mt-3" alt="Gráfica de Convergencia del Método de Jacobi">
+        </div>
+    </div>
 </div>
 
 
 <!-- JavaScript -->
 <script>
+    
+    const tolInput = document.getElementById("tol");
     const rowsInput = document.getElementById("rows");
     const columnsInput = document.getElementById("columns");
     const matrixInputsDiv = document.getElementById("matrixInputs");
+
+    let tolHiddenInput;
     
     // Escucha cambios en los campos de filas y columnas
     rowsInput.addEventListener("input", updateMatrixInputs);
     columnsInput.addEventListener("input", updateMatrixInputs);
+
+    tolInput.addEventListener("input", () => {
+        if (tolHiddenInput) {
+            tolHiddenInput.value = tolInput.value;
+        }
+    });
     
     function updateMatrixInputs() {
         // Limpiar el contenedor de inputs
@@ -96,10 +105,21 @@
         // Obtener el número de filas y columnas
         const rows = parseInt(rowsInput.value);
         const columns = parseInt(columnsInput.value);
-    
+
         if (!rows || !columns || rows < 1 || columns < 1) {
             return;
         }
+
+        // Crear campo oculto para tol si no existe
+        if (!tolHiddenInput) {
+            tolHiddenInput = document.createElement("input");
+            tolHiddenInput.type = "hidden";
+            tolHiddenInput.name = "tol";
+            matrixInputsDiv.appendChild(tolHiddenInput);
+        }
+
+        // Actualizar el valor de tolHiddenInput
+        tolHiddenInput.value = tolInput.value;
     
         const label = document.createElement("label");
         label.textContent = "Ingrese los valores de la matriz:";
@@ -181,14 +201,6 @@
         inputColumns.name = "columns";
         inputColumns.value = columns;
         matrixInputsDiv.appendChild(inputColumns);
-
-        //incluir tolerancia en el formulario
-        const inputTol = document.createElement("input");
-        inputTol.type = "hidden";
-        inputTol.name = "tol";
-        inputTol.value = document.getElementById("tol").value;
-        matrixInputsDiv.appendChild(inputTol);
-
     
     }
     </script>
