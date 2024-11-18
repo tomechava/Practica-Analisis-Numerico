@@ -262,6 +262,7 @@ def factorizacion_lu_doolittle(A):
 def jacobi(request):
     if request.POST:
         # Obtener los datos del formulario
+        tol = request.POST.get('tol')
         columns = int(request.POST['columns'])
         rows = int(request.POST['rows'])
         A = np.zeros((rows, columns))
@@ -274,13 +275,82 @@ def jacobi(request):
         for i in range(rows):
             b[i] = float(request.POST[f'b[{i}]'])
         
-        x, etapas, error_msg, alert = jacobi_method(A, b)
+        x0 = np.zeros(rows)
+        for i in range(rows):
+            x0[i] = float(request.POST[f'x0[{i}]'])
         
-        ultima = etapas[-1]
+        x, iteraciones, error_msg, alert = metodo_jacobi(A, b, x0, tol, 100)
         
-        return render(request, 'jacobi.html', {'x': x, 'img_url': 0, 'alert': alert, 'error_msg': error_msg, 'etapas': etapas, 'columns': columns, 'rows': rows, 'ultima': ultima})
+        
+        
+        return render(request, 'jacobi.html', {'x': x, 'img_url': 0, 'alert': alert, 'error_msg': error_msg, 'iteraciones': iteraciones, 'columns': columns, 'rows': rows})
     
     return render(request, 'jacobi.html')
+
+def metodo_jacobi(A, b, x0, tol, max_iter):
+    """
+    Resuelve el sistema Ax = b utilizando el método de Jacobi.
+    
+    Parámetros:
+        A: numpy.ndarray
+            Matriz de coeficientes (cuadrada).
+        b: numpy.ndarray
+            Vector de términos independientes.
+        x0: numpy.ndarray
+            Vector inicial.
+        tol: float
+            Tolerancia para la convergencia.
+        max_iter: int
+            Número máximo de iteraciones.
+            
+    Retorna:
+        x: numpy.ndarray
+            Solución aproximada del sistema.
+        iteraciones: int
+            Número de iteraciones realizadas.
+        error_msg: str
+            Mensaje de error si ocurre algún problema.
+        alert: str
+            Tipo de alerta ('success' si todo va bien, 'danger' si hay error).
+    """
+    tol = float(tol)
+    
+    n, m = A.shape   # Obtener dimensiones de la matriz A
+    error_msg = None
+    alert = None
+    
+    if n != m:      # Verificar si la matriz es cuadrada
+        error_msg = "Error: La matriz no es cuadrada."
+        alert = "danger"
+        return None, None, error_msg, alert
+    
+    if np.any(np.diag(A) == 0):     # Verificar si hay ceros en la diagonal principal
+        error_msg = "Error: La matriz tiene ceros en la diagonal principal."
+        alert = "danger"
+        return None, None, error_msg, alert
+    
+    x = x0.copy()       # Copiar el vector inicial
+    iteraciones = 0
+
+    for k in range(max_iter):
+        x_new = np.zeros_like(x)    # Crear un vector de ceros con la misma forma que x, es decir, n elementos para los valores del sistema de ecuaciones
+        
+        for i in range(n):    # Iterar sobre las filas de la matriz
+            suma = sum(A[i, j] * x[j] for j in range(n) if j != i)    # Sumar los elementos de la fila actual, excepto el de la diagonal principal
+            x_new[i] = (b[i] - suma) / A[i, i]      # Calcular el nuevo valor de la variable
+        
+        # Verificar criterio de convergencia
+        if np.linalg.norm(x_new - x, ord=np.inf) < tol:     # Calcular la norma infinito de la diferencia entre los vectores x_new y x, la norma infinito es el máximo valor absoluto de los elementos del vector, es decir el error máximo
+            alert = "success"
+            error_msg = "El sistema se resolvió correctamente."
+            return x_new, iteraciones, error_msg, alert
+        
+        x = x_new
+        iteraciones += 1
+    
+    error_msg = "Error: El método no converge después de {} iteraciones.".format(max_iter)
+    alert = "danger"
+    return None, iteraciones, error_msg, alert
 
 def gauss_seidel(request):
     if request.POST:
