@@ -5,6 +5,7 @@ import base64
 import numpy as np
 from django.http import HttpResponse
 from sympy import symbols, diff
+import math
 
 
 # Create your views here.
